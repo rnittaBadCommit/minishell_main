@@ -1,3 +1,4 @@
+<<<<<<< HEAD:child_process.c
 #include <dirent.h>
 
 typedef struct s_cmd
@@ -20,6 +21,9 @@ int isbuiltin(char *name, t_cmd cmd[], int (**ret)(char **))
     }
     return (0);
 }
+=======
+#include "minishell.h"
+>>>>>>> 7d797f74c480302d7fe8f58966f6eb1d8a727603:get_exec_path.c
 
 int ispath_ok(char *path, char *name)
 {
@@ -28,7 +32,11 @@ int ispath_ok(char *path, char *name)
 
     if (!(dir = opendir(path)))
         return (0);
+<<<<<<< HEAD:child_process.c
     while (!(dent = readdir(dir)))
+=======
+    while ((dent = readdir(dir)))
+>>>>>>> 7d797f74c480302d7fe8f58966f6eb1d8a727603:get_exec_path.c
         if (!ft_strcmp(dent->d_name, name))
         {
             closedir(dir);
@@ -45,7 +53,7 @@ int get_path_makestr(char **ret, char *path, char *name)
     path_len = ft_strlen(path);
     if (!(*ret = (char *)malloc(path_len + 1 + ft_strlen(name) + 1)))
         return (-1);
-    ft_strcpy(*ret, *path);
+    ft_strcpy(*ret, path);
     (*ret)[path_len] = '/';
     ft_strcpy(*ret + path_len + 1, name);
     return (0);
@@ -67,14 +75,13 @@ int get_path_make_strarry(t_arg_main *arg_main, char ***path)
     return (0);
 }
 
-int get_path(t_arg *arg_main, char **ret, char *name)
+int get_path(t_arg_main *arg_main, char **ret, char *name)
 {
     char **path;
     char **tmp_path;
-    t_arg arg;
     int tmp;
 
-    if (!(tmp = get_path_make_strarry(arg_main, &path)))
+    if ((tmp = get_path_make_strarry(arg_main, &path)))
         return (tmp);
     tmp_path = path;
     while (*path)
@@ -88,5 +95,5 @@ int get_path(t_arg *arg_main, char **ret, char *name)
         path++;
     }
     split_free_all(tmp_path);
-    return (0);
+    return (1);
 }
