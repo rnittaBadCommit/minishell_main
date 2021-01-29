@@ -1,29 +1,4 @@
-<<<<<<< HEAD:child_process.c
-#include <dirent.h>
-
-typedef struct s_cmd
-{
-    char *name;
-    int (*func)(char **);
-}               t_cmd;
-
-
-int isbuiltin(char *name, t_cmd cmd[], int (**ret)(char **))
-{
-    while (cmd[0].name)
-    {
-        if (!ft_strcmp(name, cmd[0].name))
-        {
-            *ret = cmd[0].func;
-            return (1);
-        }
-        cmd++;
-    }
-    return (0);
-}
-=======
 #include "minishell.h"
->>>>>>> 7d797f74c480302d7fe8f58966f6eb1d8a727603:get_exec_path.c
 
 int ispath_ok(char *path, char *name)
 {
@@ -32,11 +7,7 @@ int ispath_ok(char *path, char *name)
 
     if (!(dir = opendir(path)))
         return (0);
-<<<<<<< HEAD:child_process.c
-    while (!(dent = readdir(dir)))
-=======
     while ((dent = readdir(dir)))
->>>>>>> 7d797f74c480302d7fe8f58966f6eb1d8a727603:get_exec_path.c
         if (!ft_strcmp(dent->d_name, name))
         {
             closedir(dir);
