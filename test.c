@@ -125,13 +125,13 @@ int _syntax_check_process2(char *cmd, t_syntax_flag *syntax_flag)
 {
 	if (*cmd == '>')
 	{
-		if (syntax_flag->r_redirect >= 2 || syntax_flag->l_redirect || syntax_flag->pipe)
+		if (syntax_flag->r_redirect >= 2 || syntax_flag->l_redirect)
 			return (print_synerr(cmd));
 		(syntax_flag->r_redirect)++;
 	}
 	else if (*cmd == '<')
 	{
-		if (syntax_flag->l_redirect || syntax_flag->l_redirect || syntax_flag->pipe)
+		if (syntax_flag->r_redirect || syntax_flag->l_redirect)
 			return (print_synerr(cmd));
 		(syntax_flag->l_redirect)++;
 	}
@@ -147,11 +147,11 @@ int	_syntax_check_process(char *cmd, t_syntax_flag *syntax_flag)
 	if (*cmd == ' ')
 	{
 		if (syntax_flag->pipe)
-			syntax_flag->pipe += 2;
+			syntax_flag->pipe = 2;
 		if (syntax_flag->r_redirect)
-			syntax_flag->r_redirect += 2;
+			syntax_flag->r_redirect = 2;
 		if (syntax_flag->l_redirect)
-		    syntax_flag->l_redirect += 2;
+		    syntax_flag->l_redirect = 2;
 	}
 	else if (*cmd == '|')	
 	{
@@ -204,8 +204,82 @@ int syntax_check(char *cmd_raw)
 
 int main(void)
 {
-    printf("aa\n");
-	printf("\n%d", syntax_check(strdup("cat > \n")));
+	//printf("\n%d", syntax_check(strdup("cat > text\n")));
+    printf("newline error\n======================================\n");
+    {
+        printf("%d\n\n", syntax_check(strdup("cat |\n")));
+        printf("%d\n\n", syntax_check(strdup("cat ||\n")));
+        printf("%d\n\n", syntax_check(strdup("cat >\n")));
+        printf("%d\n\n", syntax_check(strdup("cat >>\n")));
+        printf("%d\n\n", syntax_check(strdup("cat <\n")));
+        printf("----1----\n");
+        printf("%d\n\n", syntax_check(strdup("cat | cat |\n")));
+        printf("%d\n\n", syntax_check(strdup("cat | cat |>\n")));
+        printf("%d\n\n", syntax_check(strdup("cat | cat |>>\n")));
+        printf("%d\n\n", syntax_check(strdup("cat | cat |<\n")));
+        printf("----2----\n");
+        printf("%d\n\n", syntax_check(strdup("cat | cat| \n")));
+        printf("%d\n\n", syntax_check(strdup("cat | cat|> \n")));
+        printf("%d\n\n", syntax_check(strdup("cat | cat|>> \n")));
+        printf("%d\n\n", syntax_check(strdup("cat | cat|< \n")));
+
+        printf("\nnewline  OK\n------------------------------------\n");
+        printf("%d\n\n", syntax_check(strdup("cat |cat\n")));
+        printf("%d\n\n", syntax_check(strdup("cat >text\n")));
+        printf("%d\n\n", syntax_check(strdup("cat >>text\n")));
+        printf("%d\n\n", syntax_check(strdup("cat <text\n")));
+        printf("----4----\n");
+        printf("%d\n\n", syntax_check(strdup("cat | cat | cat\n")));
+        printf("%d\n\n", syntax_check(strdup("cat | cat |> text\n")));
+        printf("%d\n\n", syntax_check(strdup("cat | cat |>> text\n")));
+        printf("%d\n\n", syntax_check(strdup("cat | cat |< text\n")));
+        printf("----5----\n");
+        printf("%d\n\n", syntax_check(strdup("cat | cat|cat \n")));
+        printf("%d\n\n", syntax_check(strdup("cat | cat|>text \n")));
+        printf("%d\n\n", syntax_check(strdup("cat | cat|>>text \n")));
+        printf("%d\n\n", syntax_check(strdup("cat | cat|<text \n")));
+        printf("============\n");
+    }
+
+    printf("> < | error\n======================================\n");
+    {
+        printf("%d\n\n", syntax_check(strdup("cat >|\n")));
+        printf("%d\n\n", syntax_check(strdup("cat >||\n")));
+        printf("%d\n\n", syntax_check(strdup("cat >|||\n")));
+        printf("%d\n\n", syntax_check(strdup("cat ><\n")));
+        printf("%d\n\n", syntax_check(strdup("cat ><<\n")));
+        printf("----11---\n");
+        printf("%d\n\n", syntax_check(strdup("cat >><\n")));
+        printf("%d\n\n", syntax_check(strdup("cat >><<\n")));
+        printf("%d\n\n", syntax_check(strdup("cat >>>\n")));
+        printf("%d\n\n", syntax_check(strdup("cat >>>>\n")));
+        printf("%d\n\n", syntax_check(strdup("cat >>>>>\n")));
+        printf("----12----\n");
+        printf("%d\n\n", syntax_check(strdup("cat <|\n")));
+        printf("%d\n\n", syntax_check(strdup("cat <||\n")));
+        printf("%d\n\n", syntax_check(strdup("cat <|||\n")));
+        printf("%d\n\n", syntax_check(strdup("cat <<\n")));
+        printf("%d\n\n", syntax_check(strdup("cat <<<\n")));
+        printf("======================\n");
+    } 
+
+    printf("pipe error\n======================================\n");
+    {
+        printf("%d\n\n", syntax_check(strdup("cat |||\n")));
+        printf("%d\n\n", syntax_check(strdup("cat | |\n")));
+        printf("%d\n\n", syntax_check(strdup("cat | ||\n")));
+        printf("%d\n\n", syntax_check(strdup("cat | |||\n")));
+        printf("----21----\n");
+        printf("%d\n\n", syntax_check(strdup("cat || |\n")));
+        printf("%d\n\n", syntax_check(strdup("cat || ||\n")));
+        printf("%d\n\n", syntax_check(strdup("cat || |||\n")));
+        printf("----22----\n");
+
+        printf("OK\n==================\n");
+        printf("%d\n\n", syntax_check(strdup("cat |\"\"\n")));
+        printf("%d\n\n", syntax_check(strdup("cat >\"\"\n")));
+
+    }
 }
 
 
