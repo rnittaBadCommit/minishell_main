@@ -5,7 +5,14 @@ SRCS = pipe/pipe.c pipe/is_x.c pipe/utils_a.c pipe/main.c builtins/cd.c\
 		builtins/echo.c builtins/export.c builtins/pwd.c builtins/unset.c \
 		builtins/env.c read_command.c get_exec_path.c utils.c argument.c\
 		main.c
+TMP = read_command.c get_exec_path.c utils.c argument.c\
+		main.c
+TMPOBJS = $(TMP:.c=.o)
 OBJS = $(SRCS:.c=.o)
+
+tmp: $(TMPOBJS)
+	make -C libft/
+	$(CC) $(CFLAGS) -o $(NAME) $(TMPOBJS) -L libft -lft
 
 all: $(NAME)
 

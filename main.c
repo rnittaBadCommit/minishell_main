@@ -16,8 +16,8 @@ char **make_command_array_splitpipe(char *cmd)
 {
 	char **cmd_split;
 
-//	if (!(cmd = separate_redirect(cmd)))
-//		return (NULL);
+	//if (!(cmd = separate_redirect(cmd)))
+	//	return (NULL);
 	if (!(cmd_split = split_command(cmd, '|')))
 	{
 		free(cmd);
@@ -88,7 +88,6 @@ void command_main(char *cmd_raw)
 			printf("%s\n", cmd_split[i][j]);
 	}
 }
-/*
 
 typedef struct s_syntax_check
 {
@@ -96,30 +95,140 @@ typedef struct s_syntax_check
 	char redirect;
 }	t_syntax_check;
 
- int _syntax_check_main_process
-int syntax_check_main(char *cmd)
+int	_syntax_check_make_sedstr(char *cmd_raw, char **ret)
 {
 	char bitflag_quote;
-	t_syntax_check check;
-	int tmp;
+	int i;
+	int j;
 
-	_bzero(&check, sizeof (t_syntax_check));
+	if (!(*ret = (char *)malloc(strlen(cmd_raw))))
+    {
+        print_error(MALLOC_FAIL);
+		return (-1);
+    }
 	bitflag_quote = 0;
+	i = -1;
+	while (*cmd_raw)
+	{
+		check_quote(*cmd_raw, &bitflag_quote);
+		if (!bitflag_quote)
+		{
+			*ret[++i] = *cmd_raw;
+			if (*cmd_raw == '\'' || *cmd_raw == '\"')
+				*ret[i] = 'a';
+		}
+		cmd_raw++;
+	}
+    *ret[++i] = '\0';
+    return (!!bitflag_quote);
+}
+
+int print_synerr(char *cmd)
+{
+	char s[8];
+
+	s[0] = cmd[0];
+	s[2] = '\0';
+	if (cmd[0] == '\n')
+		s = "newline";
+	else if (cmd[0] == '>')
+		s[1] = cmd[1] * (cmd[1] == cmd[0]);
+	else if (cmd[0] == '<')
+		s[1] = '\0';
+	else if (cmd[0] == '|')
+		s[1] = cmd[1] * (cmd[1] == cmd[0]);
+	printf("bash: syntax error near unexpected token `%s'\n", s);
+	return (258);
+}
+
+int _syntax_check_process2(char *cmd, char *flag_pipe, char *flag_r_redirect, char *flag_l_redirect)
+{
+	if (*cmd == '>')
+	{
+		if (*flag_r_redirect >= 2 || *flag_l_redirect || *flag_pipe)
+			return (print_synerr(cmd));
+		*flag_r_redirect++;
+	}
+	else if (*cmd == '<')
+	{
+		if (*flag_l_redirect || *flag_l_redirect || *flag_pipe)
+			return (print_synerr(cmd));
+		*flag_l_redirect++;
+	}
+	else
+	{
+		*flag_l_redirect = 0;
+		*flag_r_redirect = 0;
+		flag_pipe = 0;
+	}
+	return (0);
+}
+
+int	_syntax_check_process(char *cmd, char *flag_pipe, char *flag_r_redirect, char *flag_l_redirect)
+{
+	if (*cmd == ' ')
+	{
+		if (*flag_pipe)
+			*flag_pipe += 2;
+		if (*flag_r_redirect)
+			*flag_r_redirect += 2;
+		if (*flag_l_redirect)
+			flag_l_redirect += 2;
+	}
+	else if (*cmd == '|')	
+	{
+		if (*flag_pipe >= 2 || *flag_r_redirect || *flag_l_redirect)
+			return (print_synerr(PIPE));
+		*flag_pipe++;
+	}
+	else
+		return (_syntax_check_process2(cmd, flag_pipe, flag_r_redirect, flag_l_redirect));
+	return (0);
+}
+
+int syntax_check_main(char *cmd)
+{
+	char flag_pipe;
+	char flag_r_redirect;
+	char flag_l_redirect;
+
+	flag_pipe = 0;
+	flag_r_redirect = 0;
+	flag_l_redirect = 0;
 	while (*cmd)
 	{
-		if (!(tmp = _syntax_check_main_process(cmd, &check)))
-			return (tmp);
+		if (_syntax_check_process(cmd, &flag_pipe, &flag_r_redirect, &flag_l_redirect))
+			return (258);
 		cmd++;
 	}
 	return (0);
 }
 
+int syntax_check(char *cmd_raw)
+{
+	char *cmd;
+	int tmp;
+
+	if (_syntax_check_make_sedstr(cmd_raw, &cmd) == 1)
+	{
+		free(cmd);
+		print_error(SYNTAX_ERROR_QUOTE);
+		return (1);
+	}
+	if (!cmd)
+		return (-1);
+	tmp = syntax_check_main(cmd);
+	free(cmd);
+	return (tmp);	
+}
+
 int main(void)
 {
-	command_main(NULL, "cat >text ||| ls");
+	printf("\n%d", _syntax_check_make_sedstr("cat > "));
 }
 
 
+/*
 int ini(t_all *all)
 {
 	if (!(arg_main_ini(&(all->arg_main))))
