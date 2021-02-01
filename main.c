@@ -116,7 +116,6 @@ int is_strb_empty(char *s)
 {
 	int ret;
 
-	printf("%hhd\n", s[0]);
 	if (!*s)
 		return (0);
 	ret = 1;
@@ -131,15 +130,11 @@ int is_strb_empty(char *s)
 
 void	remove_empty_strb(char **cmd_split, int *i)
 {
-	char *tmp;
-
 	if (is_strb_empty(cmd_split[*i]))
-	{printf("rd\n\n");
 		free(cmd_split[*i]);
-	}
 	else
 	{
-		tmp = cmd_split[*i];
+		remove_quotes(cmd_split[*i]);
 		(*i)++;
 	}
 }

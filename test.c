@@ -171,7 +171,7 @@ char *deploy(char *input, t_arg_main *arg_main)
 			else
 			{
 				free(tmp);
-				tmp = ft_strdup("");
+				tmp = surround_minus_one("");
 			}
 		}
 		else
