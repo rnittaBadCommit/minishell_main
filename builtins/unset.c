@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/10 13:31:08 by marvin            #+#    #+#             */
-/*   Updated: 2021/02/11 22:37:22 by marvin           ###   ########.fr       */
+/*   Updated: 2021/02/11 22:39:12 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ int	ft_unset(char *argv[], t_arg_main *arg_main)
 	ret = 0;
 	while (argv[1])
 	{
-		if (!unset_name_check(argv[1]))
+		if (unset_name_check(argv[1]))
 		{
 			unset_err(BAD_ARGNAME, argv[1]);
 			ret = 1;
