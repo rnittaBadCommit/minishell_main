@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/10 15:58:57 by marvin            #+#    #+#             */
-/*   Updated: 2021/02/11 22:23:12 by marvin           ###   ########.fr       */
+/*   Updated: 2021/02/11 22:24:29 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ char	*get_path_newstr(char *old)
 	cnt = 0;
 	i = -1;
 	while (old[++i])
-		cnt += (old[i] == ':' && old[i + 1] == ':');
+		cnt += (old[i] == ':' && (!old[i + 1] || old[i + 1] == ':'));
 	ret = (char *)malloc2(ft_strlen(old) + cnt + 1);
 	i = -1;
 	j = -1;
