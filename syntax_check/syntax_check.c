@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   syntax_check.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: syudai <syudai@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/10 18:14:43 by marvin            #+#    #+#             */
-/*   Updated: 2021/02/10 18:30:34 by rnitta           ###   ########.fr       */
+/*   Updated: 2021/02/10 21:39:14 by syudai           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,7 +118,7 @@ int		syntax_check_process(char *cmd, t_syntax_flag *syntax_flag)
 	else if (*cmd == '|')
 	{
 		if (syntax_flag->pipe >= 2 || syntax_flag->r_redirect ||
-			syntax_flag->l_redirect)
+			syntax_flag->l_redirect || syntax_flag->semi)
 			return (print_synerr(cmd));
 		syntax_flag->pipe++;
 	}
