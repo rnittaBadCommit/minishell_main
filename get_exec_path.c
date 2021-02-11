@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/10 15:58:57 by marvin            #+#    #+#             */
-/*   Updated: 2021/02/10 15:58:57 by marvin           ###   ########.fr       */
+/*   Updated: 2021/02/11 22:23:12 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,19 +45,45 @@ int		get_path_makestr(char **ret, char *path, char *name)
 	return (0);
 }
 
+char	*get_path_newstr(char *old)
+{
+	int		cnt;
+	char	*ret;
+	int		i;
+	int		j;
+
+	cnt = 0;
+	i = -1;
+	while (old[++i])
+		cnt += (old[i] == ':' && old[i + 1] == ':');
+	ret = (char *)malloc2(ft_strlen(old) + cnt + 1);
+	i = -1;
+	j = -1;
+	while (old[++i])
+	{
+		ret[++j] = old[i];
+		if (old[i] == ':' && (!old[i + 1] || old[i + 1] == ':')
+			ret[++j] = '.';
+	}
+	return (ret);
+}
+
 int		get_path_make_strarry(t_arg_main *arg_main, char ***path)
 {
 	t_arg	arg;
 	int		tmp;
+	char	*newstr;
 
 	if ((tmp = arg_get(arg_main, &arg, "PATH")))
 		return (tmp);
-	if (!(*path = split_command((char *)(arg.data), ':')))
+	newstr = get_path_newstr(arg.data);
+	arg_free(&arg);
+	if (!(*path = split_command(newstr, ':')))
 	{
 		arg_free(&arg);
 		return (-1);
 	}
-	arg_free(&arg);
+	free(newstr);
 	return (0);
 }
 
