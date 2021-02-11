@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/10 15:58:57 by marvin            #+#    #+#             */
-/*   Updated: 2021/02/11 23:13:17 by marvin           ###   ########.fr       */
+/*   Updated: 2021/02/11 23:24:08 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ char	*get_path_newstr(char *old)
 
 	cnt = 0;
 	i = -1;
-	if (!old)
+	if (!old || *old == '\0')
 		return (ft_strdup("."));
 	while (old[++i])
 		cnt += (old[i] == ':' && (!old[i + 1] || old[i + 1] == ':'));
