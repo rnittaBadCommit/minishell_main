@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/10 15:58:57 by marvin            #+#    #+#             */
-/*   Updated: 2021/02/11 22:27:59 by rnitta           ###   ########.fr       */
+/*   Updated: 2021/02/11 23:13:17 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,8 @@ char	*get_path_newstr(char *old)
 
 	cnt = 0;
 	i = -1;
+	if (!old)
+		return (ft_strdup("."));
 	while (old[++i])
 		cnt += (old[i] == ':' && (!old[i + 1] || old[i + 1] == ':'));
 	ret = (char *)malloc2(ft_strlen(old) + cnt + 1);
@@ -75,9 +77,12 @@ int		get_path_make_strarry(t_arg_main *arg_main, char ***path)
 	char	*newstr;
 
 	if ((tmp = arg_get(arg_main, &arg, "PATH")))
-		return (tmp);
-	newstr = get_path_newstr(arg.data);
-	arg_free(&arg);
+		newstr = ft_strdup(".");
+	else
+	{
+		newstr = get_path_newstr(arg.data);
+		arg_free(&arg);
+	}
 	if (!(*path = split_command(newstr, ':')))
 	{
 		arg_free(&arg);
