@@ -3,125 +3,108 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: syudai <syudai@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/02/10 13:29:12 by marvin            #+#    #+#             */
-/*   Updated: 2021/02/10 16:12:40 by marvin           ###   ########.fr       */
+/*   Created: 2021/01/28 17:48:31 by syudai            #+#    #+#             */
+/*   Updated: 2021/02/11 19:48:49 by syudai           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char		*g_signal;
-t_arg_main	*g_arg_main;
-
-void	command_main(char *cmd_raw, t_arg_main *arg_main)
+void	err_general(char *s, char *err, int status)
 {
-	char	***cmd_split;
-	char	***tmp_cmd_split;
-	int		i;
-	int		j;
-	char	*tmp;
+	ft_putstr_fd("minishell: ", 2);
+	ft_putstr_fd(s, 2);
+	ft_putstr_fd(": ", 2);
+	ft_putendl_fd(err, 2);
+	set_hatena(g_arg_main, status);
+}
 
-	cmd_split = make_command_array(cmd_raw);
-	tmp_cmd_split = cmd_split;
-	while (*tmp_cmd_split)
+void	one_command_bin(char ***cmd, char ***raw_cmd, t_arg_main *arg_main)
+{
+	pid_t	pid;
+	int		status;
+	char	*path;
+	int		r;
+
+	r = 0;
+	if (ft_strchr((*cmd)[0], '/') ||
+	(r = get_path(arg_main, &path, (*cmd)[0])) == 0)
 	{
-		j = -1;
-		i = 0;
-		while (tmp_cmd_split[0][++j])
+		if ((pid = fork()) == 0)
 		{
-			tmp = tmp_cmd_split[0][j];
-			tmp_cmd_split[0][i] = deploy(tmp, arg_main);
-			free(tmp);
-			remove_empty_strb(tmp_cmd_split[0], &i);
+			just_for_child(raw_cmd, cmd, path, arg_main);
 		}
-		tmp_cmd_split[0][i] = NULL;
-		tmp_cmd_split++;
+		if (ft_strchr((*cmd)[0], '/') == NULL)
+			free(path);
+		waitpid(pid, &status, 0);
+		if (WIFEXITED(status))
+			set_hatena(arg_main, WEXITSTATUS(status));
+		else
+			write(2, "\n", 1);
 	}
-	pipeline((tmp_cmd_split = make_strb_array(cmd_split)), cmd_split, arg_main);
-	command_main_free(cmd_split, tmp_cmd_split);
+	else if (r == 1)
+		err_general((*cmd)[0], "command not found", 127);
+	else
+		error_one_to_seven(arg_main, (*cmd)[0]);
 }
 
-void	sig_handler(int sig)
+void	one_command_bin_e(char ***raw_cmd, t_arg_main *arg_main)
 {
-	t_arg	arg;
+	pid_t	pid;
+	int		status;
 
-	arg.name = "?";
-	arg.type = ARG_TYPE_STR;
-	if (sig == SIGINT)
+	pid = fork();
+	if (pid == 0)
 	{
-		arg.data = ft_strdup(g_signal);
-		arg_add(g_arg_main, &arg);
-		free((char *)(arg.data));
-		if (!ft_strcmp(g_signal, "1"))
-			write(1, "\b\b  \n$ ", 7);
-		g_arg_main->flag_sig = 1;
+		just_for_norm(raw_cmd);
+		exit(0);
 	}
-	else if (sig == SIGQUIT && ft_strcmp(g_signal, "1"))
-	{
-		arg.data = "131";
-		arg_add(g_arg_main, &arg);
-		write(2, "Quit: 3", 7);
-	}
-	else if (sig == SIGQUIT)
-		write(2, "\b\b  \b\b\n$ ", 6);
+	waitpid(pid, &status, 0);
+	set_hatena(arg_main, WEXITSTATUS(status));
 }
 
-char	*main_process_ini(void)
+int		rare_exception(char ***raw_cmd)
 {
-	char	*cmd_all;
+	int i;
 
-	write(2, "$ ", 2);
-	g_signal = "1";
-	g_arg_main->flag_sig = 0;
-	cmd_all = read_all(0);
-	g_signal = "130";
-	if (syntax_check(cmd_all))
+	i = 0;
+	while ((*raw_cmd)[i])
 	{
-		free(cmd_all);
-		return (NULL);
-	}
-	return (cmd_all);
-}
-
-void	main_process(t_arg_main *arg_main)
-{
-	char		*cmd_all;
-	char		**cmd_split;
-	char		**tmp_cmd_split;
-
-	while (1)
-	{
-		if (!(cmd_all = main_process_ini()))
-			continue;
-		cmd_split = split_command(cmd_all, ';');
-		tmp_cmd_split = cmd_split;
-		while (*cmd_split)
+		if (i % 2 == 0)
 		{
-			command_main(*cmd_split, arg_main);
-			dup2(arg_main->std_in, 0);
-			dup2(arg_main->std_out, 1);
-			cmd_split++;
+			if (ft_strcmp(">", (*raw_cmd)[0]) != 0
+			&& ft_strcmp("<", (*raw_cmd)[0]) != 0
+			&& ft_strcmp(">>", (*raw_cmd)[0]) != 0)
+				return (0);
 		}
-		split_free_all(tmp_cmd_split);
-		free(cmd_all);
+		i++;
 	}
+	if (i % 2 != 0 || i == 0)
+		return (0);
+	return (1);
 }
 
-int		main(int argc, char *argv[], char *env[])
+void	one_command(char ***cmd, char ***raw_cmd, t_arg_main *arg_main)
 {
-	t_arg_main	arg_main;
+	int tmp;
+	int semi[2];
 
-	(void)argc;
-	(void)argv;
-	ini(&arg_main, env);
-	arg_main.std_in = dup(0);
-	arg_main.std_out = dup(1);
-	signal(SIGINT, sig_handler);
-	signal(SIGQUIT, sig_handler);
-	main_process(&arg_main);
-	arg_list_ini(&arg_main);
-	arg_free(&arg_main.head.arg);
-	return (0);
+	if (rare_exception(raw_cmd))
+		one_command_bin_e(raw_cmd, arg_main);
+	else if ((tmp = is_builtin((*cmd)[0])))
+	{
+		if (set_right(raw_cmd, 0, semi, 0) ||
+			set_left(raw_cmd, 0, semi, 0))
+		{
+			set_hatena(arg_main, 1);
+			return ;
+		}
+		set_hatena(g_arg_main, call_builtin(tmp, *cmd, arg_main));
+	}
+	else
+	{
+		one_command_bin(cmd, raw_cmd, arg_main);
+	}
 }
