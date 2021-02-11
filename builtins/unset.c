@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/10 13:31:08 by marvin            #+#    #+#             */
-/*   Updated: 2021/02/11 22:39:12 by marvin           ###   ########.fr       */
+/*   Updated: 2021/02/11 22:57:27 by rnitta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ int		unset_name_check(char *cmd)
 	return (0);
 }
 
-int	ft_unset(char *argv[], t_arg_main *arg_main)
+int		ft_unset(char *argv[], t_arg_main *arg_main)
 {
 	int	ret;
 
