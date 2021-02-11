@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/10 15:58:57 by marvin            #+#    #+#             */
-/*   Updated: 2021/02/11 22:24:29 by marvin           ###   ########.fr       */
+/*   Updated: 2021/02/11 22:27:59 by rnitta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ char	*get_path_newstr(char *old)
 	while (old[++i])
 	{
 		ret[++j] = old[i];
-		if (old[i] == ':' && (!old[i + 1] || old[i + 1] == ':')
+		if (old[i] == ':' && (!old[i + 1] || old[i + 1] == ':'))
 			ret[++j] = '.';
 	}
 	return (ret);
