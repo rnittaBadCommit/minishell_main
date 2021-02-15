@@ -6,7 +6,7 @@
 /*   By: syudai <syudai@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/06 17:58:19 by syudai            #+#    #+#             */
-/*   Updated: 2021/02/15 23:22:19 by rnitta           ###   ########.fr       */
+/*   Updated: 2021/02/15 23:45:55 by rnitta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ int		valid_option(char *now)
 {
 	int i;
 
-	if (now[0] != '-')
+	if (now[0] != '-' || !now[1])
 		return (0);
 	i = 1;
 	while (now[i])
